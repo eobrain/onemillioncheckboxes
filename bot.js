@@ -7,11 +7,15 @@ const sleep = (delayMs) => new Promise((resolve) => setTimeout(resolve, delayMs)
 const $getCheck = i =>
   document.getElementById(`checkbox-${i}`)
 
-async function possiblyClick (i, $check) {
-  const actual = $check.checked
-  const degree = i
+const f = i => {
+  const degree = i / 10
   const modulus = 2 + Math.round(3 * (1 + Math.sin(degree * Math.PI / 180)))
-  const desired = i % modulus === 0
+  return i % modulus === 0
+}
+
+async function possiblyClick (i, $check) {
+  const desired = f(i)
+  const actual = $check.checked
   if (actual !== desired) {
     $check.click()
     await sleep(251)
