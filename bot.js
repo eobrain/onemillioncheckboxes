@@ -4,9 +4,6 @@ window.alert = () => {
 
 const sleep = (delayMs) => new Promise((resolve) => setTimeout(resolve, delayMs))
 
-const $getCheck = i =>
-  document.getElementById(`checkbox-${i}`)
-
 const f = i => {
   const degree = i / 10
   const modulus = 2 + Math.round(3 * (1 + Math.sin(degree * Math.PI / 180)))
@@ -24,27 +21,16 @@ async function possiblyClick (i, $check) {
   }
 }
 
-async function patternAreaWindow () {
-  let i = 1
-  let direction = 1
-  let badCount = 0
+async function patternInFoundElems () {
   while (true) {
-    console.warn({ i, direction, badCount })
-    const $check = $getCheck(i)
-    const inWindow = !!$check
-    if (inWindow) {
+    const startMs = Date.now()
+    for (const $check of document.getElementsByClassName('kjKrcT')) {
+      const i = Number($check.id.replace(/^checkbox-/, ''))
       await possiblyClick(i, $check)
-      badCount = 0
-    } else {
-      ++badCount
-      if (badCount > 10) {
-        direction = -direction
-        badCount = 0
-      }
-      await sleep(1)
     }
-    i += direction
+    await sleep(1)
+    console.warn((Date.now() - startMs) / 1000, 'seconds')
   }
 }
 
-await patternAreaWindow()
+await patternInFoundElems()
