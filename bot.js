@@ -4,41 +4,42 @@ window.alert = () => {
 
 const sleep = (delayMs) => new Promise((resolve) => setTimeout(resolve, delayMs))
 
-const $countH2 = document.querySelector('h1 + h2')
-
-const getCount = () => Number($countH2.innerText.split(' ')[0].replace(/,/, ''))
-
 const $getCheck = i =>
   document.getElementById(`checkbox-${i}`)
 
+async function possiblyClick (i, $check) {
+  const actual = $check.checked
+  const degree = i
+  const modulus = 2 + Math.round(3 * (1 + Math.sin(degree * Math.PI / 180)))
+  const desired = i % modulus === 0
+  if (actual !== desired) {
+    $check.click()
+    await sleep(251)
+  } else {
+    await sleep(1)
+  }
+}
+
 async function patternAreaWindow () {
   let i = 1
-  let $check
-  while (!($check = $getCheck(i))) {
-    await sleep(1)
-    ++i
-  }
-  const startI = i
+  let direction = 1
+  let badCount = 0
   while (true) {
-    let count = 0
-
-    i = startI
-    console.warn('starting at ', i)
-    while ($check = $getCheck(i)) {
-      const actual = $check.checked
-      const degree = i / 10
-      const modulus = 2 + Math.round(3 * (1 + Math.sin(degree * Math.PI / 180)))
-      const desired = i % modulus == 0
-      // console.warn(i-A,{desired,actual})
-      if (actual !== desired) {
-        $check.click()
-        ++count
-        await sleep(251)
+    console.warn({ i, direction, badCount })
+    const $check = $getCheck(i)
+    const inWindow = !!$check
+    if (inWindow) {
+      await possiblyClick(i, $check)
+      badCount = 0
+    } else {
+      ++badCount
+      if (badCount > 10) {
+        direction = -direction
+        badCount = 0
       }
-      ++i
+      await sleep(1)
     }
-    console.warn('finished at ', i, 'count=', count)
-    await sleep(100)
+    i += direction
   }
 }
 
